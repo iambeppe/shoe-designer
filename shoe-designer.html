@@ -5,55 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shoe Designer - Crea la tua scarpa dell'empatia</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --pink-sand: #f2007d;
+            --sunset: #441f72;
+            --aquamarine: #2abeb9;
+            --sunrays: #ffb511;
+            --white-flakes: #ffffff;
+            --dark-lava: #1e0023;
+        }
+        
+        body { 
+            font-family: 'Ubuntu', sans-serif; 
+            background: linear-gradient(135deg, var(--sunrays) 0%, var(--pink-sand) 100%);
+        }
+        
+        .title-font { 
+            font-family: 'Permanent Marker', cursive; 
+        }
+        
         .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #8b5cf6;
+            border: 3px solid rgba(242, 0, 125, 0.3);
+            border-top: 3px solid var(--pink-sand);
             border-radius: 50%;
             width: 60px;
             height: 60px;
             animation: spin 1s linear infinite;
         }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--sunrays), var(--pink-sand));
+        }
+        
+        .gradient-secondary {
+            background: linear-gradient(135deg, var(--sunrays), var(--pink-sand));
+        }
+        
+        .btn-primary {
+            background: var(--pink-sand);
+            color: var(--white-flakes);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: var(--sunset);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(242, 0, 125, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--aquamarine);
+            color: var(--white-flakes);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--sunrays);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 20px 40px rgba(30, 0, 35, 0.1);
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen">
+<body class="min-h-screen">
     <div id="app" class="max-w-4xl mx-auto p-6">
         <!-- Header -->
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
+            <h1 class="title-font text-5xl font-bold mb-2" style="color: var(--white-flakes); text-shadow: 2px 2px 4px rgba(30, 0, 35, 0.5);">
                 Shoe Designer AI
             </h1>
-            <p class="text-xl text-gray-700">Crea la tua scarpa dell'empatia personalizzata</p>
+            <p class="text-xl font-medium" style="color: var(--white-flakes);">Crea la tua scarpa dell'empatia personalizzata</p>
         </div>
 
         <!-- Progress Bar -->
         <div class="mb-8">
             <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-medium text-gray-600">Step <span id="current-step">1</span> di 5</span>
-                <span class="text-sm text-gray-500"><span id="progress-percent">20</span>%</span>
+                <span class="text-sm font-medium" style="color: var(--white-flakes);">Step <span id="current-step">1</span> di 5</span>
+                <span class="text-sm" style="color: var(--white-flakes); opacity: 0.8;"><span id="progress-percent">20</span>%</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2">
-                <div id="progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300" style="width: 20%"></div>
+            <div class="w-full bg-white bg-opacity-30 rounded-full h-3">
+                <div id="progress-bar" class="gradient-secondary h-3 rounded-full transition-all duration-500" style="width: 20%"></div>
             </div>
         </div>
 
         <!-- Main Content -->
-        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div class="card-shadow rounded-2xl p-8 mb-8" style="background-color: var(--white-flakes);">
             <div id="step-content"></div>
         </div>
 
         <!-- Navigation -->
         <div class="flex justify-between">
-            <button id="prev-btn" class="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            <button id="prev-btn" class="flex items-center gap-2 px-6 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--white-flakes); color: var(--dark-lava); border: 2px solid var(--aquamarine);">
                 ← Indietro
             </button>
-            <button id="next-btn" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            <button id="next-btn" class="btn-primary flex items-center gap-2 px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
                 Avanti →
             </button>
         </div>
@@ -62,9 +115,11 @@
     <script>
         // Stato dell'applicazione
         let currentStep = 1;
+        let selectedGender = 'unisex';
         let selectedModel = null;
         let selectedColors = [];
         let selectedCustomizations = [];
+        let customDetail = '';
         let selectedStyle = null;
         let customStyle = '';
         let expandedCategory = null;
@@ -80,26 +135,33 @@
             { id: 'sandal', name: 'Sandalo', emoji: '👡' },
             { id: 'loafer', name: 'Mocassino', emoji: '👞' },
             { id: 'oxford', name: 'Oxford', emoji: '👔' },
-            { id: 'slip_on', name: 'Slip-on', emoji: '🥿' }
+            { id: 'slides', name: 'Ciabatta', emoji: '🩴' }
         ];
 
         const colorPalette = [
-            { id: 'red', name: 'Rosso', hex: '#FF4444' },
-            { id: 'blue', name: 'Blu', hex: '#4444FF' },
-            { id: 'green', name: 'Verde', hex: '#44FF44' },
-            { id: 'yellow', name: 'Giallo', hex: '#FFFF44' },
-            { id: 'purple', name: 'Viola', hex: '#AA44FF' },
-            { id: 'orange', name: 'Arancione', hex: '#FF8844' },
-            { id: 'pink', name: 'Rosa', hex: '#FF44AA' },
-            { id: 'teal', name: 'Turchese', hex: '#44FFAA' },
-            { id: 'brown', name: 'Marrone', hex: '#8B4513' },
-            { id: 'black', name: 'Nero', hex: '#333333' },
-            { id: 'white', name: 'Bianco', hex: '#FFFFFF' },
-            { id: 'gold', name: 'Oro', hex: '#FFD700' },
-            { id: 'silver', name: 'Argento', hex: '#C0C0C0' },
-            { id: 'coral', name: 'Corallo', hex: '#FF7F50' },
-            { id: 'mint', name: 'Menta', hex: '#98FB98' },
-            { id: 'navy', name: 'Blu Navy', hex: '#000080' }
+            // Prima fila - Colori brand Lastminute
+            { id: 'pink_sand', name: 'Pink Sand', displayName: 'Pink Sand', hex: '#f2007d', aiName: 'pink' },
+            { id: 'sunset', name: 'Sunset', displayName: 'Sunset', hex: '#441f72', aiName: 'purple' },
+            { id: 'aquamarine', name: 'Aquamarine', displayName: 'Aquamarine', hex: '#2abeb9', aiName: 'teal' },
+            { id: 'sunrays', name: 'Sunrays', displayName: 'Sunrays', hex: '#ffb511', aiName: 'yellow' },
+            { id: 'white_flakes', name: 'White Flakes', displayName: 'White Flakes', hex: '#ffffff', aiName: 'white' },
+            { id: 'dark_lava', name: 'Dark Lava', displayName: 'Dark Lava', hex: '#1e0023', aiName: 'black' },
+            
+            // Seconda fila - Colori sportivi e complementari
+            { id: 'roma_red', name: 'Rosso Roma', displayName: 'Rosso Roma', hex: '#cc0000', aiName: 'red' },
+            { id: 'lazio_blue', name: 'Celeste Lazio', displayName: 'Celeste Lazio', hex: '#87ceeb', aiName: 'light blue' },
+            { id: 'blue', name: 'Blu', displayName: 'Blu', hex: '#2563eb', aiName: 'blue' },
+            { id: 'green_light', name: 'Verde Chiaro', displayName: 'Verde Chiaro', hex: '#10b981', aiName: 'light green' },
+            { id: 'green_dark', name: 'Verde Scuro', displayName: 'Verde Scuro', hex: '#047857', aiName: 'dark green' },
+            { id: 'orange', name: 'Arancione', displayName: 'Arancione', hex: '#ea580c', aiName: 'orange' },
+            
+            // Terza fila - Altri colori
+            { id: 'brown', name: 'Marrone', displayName: 'Marrone', hex: '#92400e', aiName: 'brown' },
+            { id: 'light_blue', name: 'Azzurro Pastello', displayName: 'Azzurro Pastello', hex: '#7dd3fc', aiName: 'light blue' },
+            { id: 'gray', name: 'Grigio', displayName: 'Grigio', hex: '#6b7280', aiName: 'gray' },
+            { id: 'gold', name: 'Oro', displayName: 'Oro', hex: '#d97706', aiName: 'gold' },
+            { id: 'silver', name: 'Argento', displayName: 'Argento', hex: '#9ca3af', aiName: 'silver' },
+            { id: 'red', name: 'Rosso', displayName: 'Rosso', hex: '#dc2626', aiName: 'red' }
         ];
 
         const customizationCategories = [
@@ -110,7 +172,9 @@
                     { id: 'cat', name: 'Gattino', emoji: '🐱' },
                     { id: 'dog', name: 'Cagnolino', emoji: '🐶' },
                     { id: 'butterfly', name: 'Farfalla', emoji: '🦋' },
-                    { id: 'unicorn', name: 'Unicorno', emoji: '🦄' }
+                    { id: 'unicorn', name: 'Unicorno', emoji: '🦄' },
+                    { id: 'wolf', name: 'Lupa', emoji: '🐺' },
+                    { id: 'eagle', name: 'Aquila', emoji: '🦅' }
                 ]
             },
             {
@@ -120,17 +184,21 @@
                     { id: 'rainbow', name: 'Arcobaleno', emoji: '🌈' },
                     { id: 'flower', name: 'Fiore', emoji: '🌸' },
                     { id: 'star', name: 'Stella', emoji: '⭐' },
-                    { id: 'moon', name: 'Luna', emoji: '🌙' }
+                    { id: 'moon', name: 'Luna', emoji: '🌙' },
+                    { id: 'sun', name: 'Sole', emoji: '☀️' },
+                    { id: 'lightning', name: 'Fulmine', emoji: '⚡' }
                 ]
             },
             {
                 id: 'art',
-                name: 'Arte Classica',
+                name: 'Arte',
                 items: [
                     { id: 'scream', name: 'Urlo di Munch', emoji: '😱' },
                     { id: 'sunflower', name: 'Girasoli Van Gogh', emoji: '🌻' },
-                    { id: 'wave', name: 'Onda Giapponese', emoji: '🌊' },
-                    { id: 'starry', name: 'Notte Stellata', emoji: '🌌' }
+                    { id: 'wave', name: 'Onda di Hokusai', emoji: '🌊' },
+                    { id: 'starry', name: 'Notte Stellata di Van Gogh', emoji: '🌌' },
+                    { id: 'mondrian', name: 'Composition in Red, Blue and Yellow di Mondrian', emoji: '🔴' },
+                    { id: 'guernica', name: 'Guernica di Picasso', emoji: '🎨' }
                 ]
             },
             {
@@ -140,7 +208,9 @@
                     { id: 'stripes', name: 'Righe', emoji: '〰️' },
                     { id: 'dots', name: 'Pois', emoji: '⚪' },
                     { id: 'zigzag', name: 'Zigzag', emoji: '⚡' },
-                    { id: 'chevron', name: 'Chevron', emoji: '📐' }
+                    { id: 'chevron', name: 'Chevron', emoji: '📐' },
+                    { id: 'triangle', name: 'Triangoli', emoji: '🔺' },
+                    { id: 'circle', name: 'Cerchi', emoji: '⭕' }
                 ]
             },
             {
@@ -148,9 +218,11 @@
                 name: 'Simboli',
                 items: [
                     { id: 'heart', name: 'Cuore', emoji: '💖' },
-                    { id: 'lightning', name: 'Fulmine', emoji: '⚡' },
+                    { id: 'lightning_symbol', name: 'Fulmine', emoji: '⚡' },
                     { id: 'peace', name: 'Pace', emoji: '☮️' },
-                    { id: 'music', name: 'Nota Musicale', emoji: '🎵' }
+                    { id: 'music', name: 'Nota Musicale', emoji: '🎵' },
+                    { id: 'diamond', name: 'Diamante', emoji: '💎' },
+                    { id: 'crown', name: 'Corona', emoji: '👑' }
                 ]
             },
             {
@@ -160,27 +232,9 @@
                     { id: 'pizza', name: 'Pizza', emoji: '🍕' },
                     { id: 'donut', name: 'Ciambella', emoji: '🍩' },
                     { id: 'cherry', name: 'Ciliegia', emoji: '🍒' },
-                    { id: 'avocado', name: 'Avocado', emoji: '🥑' }
-                ]
-            },
-            {
-                id: 'space',
-                name: 'Spazio',
-                items: [
-                    { id: 'planet', name: 'Pianeta', emoji: '🪐' },
-                    { id: 'rocket', name: 'Razzo', emoji: '🚀' },
-                    { id: 'alien', name: 'Alieno', emoji: '👽' },
-                    { id: 'ufo', name: 'UFO', emoji: '🛸' }
-                ]
-            },
-            {
-                id: 'lastminute',
-                name: 'Lastminute Flamoji',
-                items: [
-                    { id: 'flame1', name: 'Fiamma Cool', emoji: '🔥' },
-                    { id: 'flame2', name: 'Fiamma Party', emoji: '🎉' },
-                    { id: 'flame3', name: 'Fiamma Travel', emoji: '✈️' },
-                    { id: 'flame4', name: 'Fiamma Love', emoji: '💕' }
+                    { id: 'avocado', name: 'Avocado', emoji: '🥑' },
+                    { id: 'strawberry', name: 'Fragola', emoji: '🍓' },
+                    { id: 'ice_cream', name: 'Gelato', emoji: '🍦' }
                 ]
             }
         ];
@@ -225,17 +279,28 @@
         // Generazione del prompt
         function generatePrompt() {
             const modelName = shoeModels.find(m => m.id === selectedModel)?.name || 'shoe';
-            const colors = selectedColors.map(c => colorPalette.find(color => color.id === c)?.name).join(', ');
-            const customizations = selectedCustomizations.map(c => {
+            const colors = selectedColors.map(c => colorPalette.find(color => color.id === c)?.aiName).join(', ');
+            
+            // Combina personalizzazioni predefinite e custom
+            let allCustomizations = selectedCustomizations.map(c => {
                 for (const category of customizationCategories) {
                     const item = category.items.find(i => i.id === c);
                     if (item) return item.name;
                 }
                 return '';
-            }).join(', ');
+            });
+            
+            if (customDetail) {
+                allCustomizations.push(customDetail);
+            }
+            
+            const customizations = allCustomizations.join(', ');
             const style = selectedStyle ? styleOptions.find(s => s.id === selectedStyle)?.name : customStyle;
+            
+            // Aggiungi indicazione genere
+            const genderText = selectedGender === 'male' ? 'for men' : selectedGender === 'female' ? 'for women' : 'unisex';
 
-            let finalPrompt = `professional photography of a realistic ${modelName} shoe, colors: ${colors}`;
+            let finalPrompt = `professional photography of a realistic ${modelName} shoe ${genderText}, colors: ${colors}`;
             
             if (customizations) {
                 finalPrompt += `, decorations: ${customizations}`;
@@ -354,19 +419,42 @@
         // Render degli step
         function renderStep1() {
             document.getElementById('step-content').innerHTML = `
-                <div class="space-y-6">
+                <div class="space-y-8">
                     <div class="text-center">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Scegli il Modello</h2>
-                        <p class="text-gray-600">Seleziona il tipo di scarpa che vuoi personalizzare</p>
+                        <h2 class="title-font text-4xl font-bold mb-2" style="color: var(--sunset);">Scegli il Modello</h2>
+                        <p class="text-lg" style="color: var(--dark-lava);">Seleziona il tipo di scarpa e il genere</p>
                     </div>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${shoeModels.map(model => `
-                            <button onclick="selectModel('${model.id}')" class="model-btn p-6 rounded-xl border-2 transition-all transform hover:scale-105 ${selectedModel === model.id ? 'border-purple-500 bg-purple-50 ring-4 ring-purple-200' : 'border-gray-200 hover:border-purple-300'}" data-model="${model.id}">
-                                <div class="text-4xl mb-2">${model.emoji}</div>
-                                <div class="font-medium text-gray-800">${model.name}</div>
+                    <!-- Modelli di Scarpa -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-center" style="color: var(--sunset);">Tipo di Scarpa</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            ${shoeModels.map(model => `
+                                <button onclick="selectModel('${model.id}')" class="model-btn p-6 rounded-xl border-3 transition-all transform hover:scale-105 hover:shadow-lg ${selectedModel === model.id ? 'border-pink-sand bg-pink-50 shadow-xl' : 'border-gray-200 hover:border-aquamarine'}" data-model="${model.id}" style="${selectedModel === model.id ? 'border-color: var(--pink-sand); background-color: rgba(242, 0, 125, 0.1);' : 'border-color: #e5e7eb;'} border-width: 3px;">
+                                    <div class="text-5xl mb-3">${model.emoji}</div>
+                                    <div class="font-semibold" style="color: var(--dark-lava);">${model.name}</div>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Selettore Genere -->
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-4" style="color: var(--sunset);">Genere</h3>
+                        <div class="flex justify-center gap-4">
+                            <button onclick="selectGender('male')" class="gender-btn px-6 py-3 rounded-lg border-3 transition-all transform hover:scale-105 ${selectedGender === 'male' ? 'border-pink-sand bg-pink-50 shadow-lg' : 'border-gray-300 hover:border-aquamarine'}" data-gender="male" style="${selectedGender === 'male' ? 'border-color: var(--pink-sand); background-color: rgba(242, 0, 125, 0.1);' : 'border-color: #d1d5db;'} border-width: 3px;">
+                                <div class="text-2xl mb-1">👨</div>
+                                <div class="font-semibold" style="color: var(--dark-lava);">Uomo</div>
                             </button>
-                        `).join('')}
+                            <button onclick="selectGender('female')" class="gender-btn px-6 py-3 rounded-lg border-3 transition-all transform hover:scale-105 ${selectedGender === 'female' ? 'border-pink-sand bg-pink-50 shadow-lg' : 'border-gray-300 hover:border-aquamarine'}" data-gender="female" style="${selectedGender === 'female' ? 'border-color: var(--pink-sand); background-color: rgba(242, 0, 125, 0.1);' : 'border-color: #d1d5db;'} border-width: 3px;">
+                                <div class="text-2xl mb-1">👩</div>
+                                <div class="font-semibold" style="color: var(--dark-lava);">Donna</div>
+                            </button>
+                            <button onclick="selectGender('unisex')" class="gender-btn px-6 py-3 rounded-lg border-3 transition-all transform hover:scale-105 ${selectedGender === 'unisex' ? 'border-pink-sand bg-pink-50 shadow-lg' : 'border-gray-300 hover:border-aquamarine'}" data-gender="unisex" style="${selectedGender === 'unisex' ? 'border-color: var(--pink-sand); background-color: rgba(242, 0, 125, 0.1);' : 'border-color: #d1d5db;'} border-width: 3px;">
+                                <div class="text-2xl mb-1">👥</div>
+                                <div class="font-semibold" style="color: var(--dark-lava);">Unisex</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -376,31 +464,31 @@
             document.getElementById('step-content').innerHTML = `
                 <div class="space-y-6">
                     <div class="text-center">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Scegli i Colori</h2>
-                        <p class="text-gray-600">Seleziona da 1 a 4 colori per la tua scarpa</p>
-                        <div class="mt-2 text-sm text-purple-600 font-medium">
+                        <h2 class="title-font text-4xl font-bold mb-2" style="color: var(--sunset);">Scegli i Colori</h2>
+                        <p class="text-lg" style="color: var(--dark-lava);">Seleziona da 1 a 4 colori per la tua scarpa</p>
+                        <div class="mt-2 text-lg font-semibold" style="color: var(--pink-sand);">
                             ${selectedColors.length}/4 colori selezionati
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-4 md:grid-cols-8 gap-3">
+                    <div class="grid grid-cols-6 gap-3">
                         ${colorPalette.map(color => `
-                            <button onclick="toggleColor('${color.id}')" class="color-btn relative w-16 h-16 rounded-lg border-4 transition-all transform hover:scale-110 ${selectedColors.includes(color.id) ? 'border-gray-800 ring-4 ring-purple-300' : 'border-gray-300 hover:border-gray-400'}" style="background-color: ${color.hex}" title="${color.name}" data-color="${color.id}">
-                                ${selectedColors.includes(color.id) ? '<div class="absolute inset-0 flex items-center justify-center"><div class="w-6 h-6 bg-white rounded-full flex items-center justify-center"><div class="w-3 h-3 bg-gray-800 rounded-full"></div></div></div>' : ''}
+                            <button onclick="toggleColor('${color.id}')" class="color-btn relative w-16 h-16 rounded-lg border-3 transition-all transform hover:scale-110 hover:shadow-lg ${selectedColors.includes(color.id) ? 'border-pink-sand shadow-xl' : 'border-gray-300 hover:border-aquamarine'}" style="background-color: ${color.hex}; ${selectedColors.includes(color.id) ? 'border-color: var(--pink-sand);' : 'border-color: #d1d5db;'} border-width: 3px;" title="${color.displayName}" data-color="${color.id}">
+                                ${selectedColors.includes(color.id) ? '<div class="absolute inset-0 flex items-center justify-center"><div style="color: ' + (color.hex === '#ffffff' || color.hex === '#ffb511' || color.hex === '#7dd3fc' || color.hex === '#87ceeb' ? 'var(--dark-lava)' : 'var(--white-flakes)') + '; font-size: 24px; font-weight: bold;">✓</div></div>' : ''}
                             </button>
                         `).join('')}
                     </div>
                     
                     ${selectedColors.length > 0 ? `
-                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium text-gray-800 mb-2">Colori selezionati:</h3>
+                        <div class="mt-6 p-4 rounded-lg" style="background-color: rgba(242, 0, 125, 0.1); border: 2px solid var(--pink-sand);">
+                            <h3 class="font-semibold text-lg mb-2" style="color: var(--sunset);">Colori selezionati:</h3>
                             <div class="flex flex-wrap gap-2">
                                 ${selectedColors.map(colorId => {
                                     const color = colorPalette.find(c => c.id === colorId);
                                     return `
-                                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium flex items-center gap-2">
-                                            <div class="w-3 h-3 rounded-full border border-gray-400" style="background-color: ${color.hex}"></div>
-                                            ${color.name}
+                                        <span class="px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2" style="background-color: var(--aquamarine); color: var(--white-flakes);">
+                                            <div class="w-4 h-4 rounded-full border-2" style="background-color: ${color.hex}; border-color: var(--white-flakes);"></div>
+                                            ${color.displayName}
                                         </span>
                                     `;
                                 }).join('')}
@@ -415,27 +503,27 @@
             document.getElementById('step-content').innerHTML = `
                 <div class="space-y-6">
                     <div class="text-center">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Personalizzazione</h2>
-                        <p class="text-gray-600">Aggiungi fino a 3 decorazioni alla tua scarpa</p>
-                        <div class="mt-2 text-sm text-purple-600 font-medium">
-                            ${selectedCustomizations.length}/3 decorazioni selezionate
+                        <h2 class="title-font text-4xl font-bold mb-2" style="color: var(--sunset);">Personalizzazione</h2>
+                        <p class="text-lg" style="color: var(--dark-lava);">Aggiungi fino a 3 dettagli lasciandoti ispirare da quelli qui di seguito</p>
+                        <div class="mt-2 text-lg font-semibold" style="color: var(--pink-sand);">
+                            ${selectedCustomizations.length}/3 dettagli selezionati
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         ${customizationCategories.map(category => `
-                            <div class="border rounded-lg overflow-hidden">
-                                <button onclick="toggleCategory('${category.id}')" class="w-full p-4 bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between">
-                                    <span class="font-medium text-gray-800">${category.name}</span>
-                                    <span class="transform transition-transform ${expandedCategory === category.id ? 'rotate-90' : ''}">▶</span>
+                            <div class="border-3 rounded-lg overflow-hidden" style="border-color: var(--aquamarine);">
+                                <button onclick="toggleCategory('${category.id}')" class="w-full p-4 transition-colors flex items-center justify-between" style="background-color: var(--aquamarine); color: var(--white-flakes);">
+                                    <span class="font-semibold">${category.name}</span>
+                                    <span class="transform transition-transform text-xl ${expandedCategory === category.id ? 'rotate-90' : ''}">▶</span>
                                 </button>
                                 
-                                <div id="category-${category.id}" class="p-2 space-y-2" style="display: ${expandedCategory === category.id ? 'block' : 'none'}">
+                                <div id="category-${category.id}" class="p-2 space-y-2" style="display: ${expandedCategory === category.id ? 'block' : 'none'}; background-color: var(--white-flakes);">
                                     ${category.items.map(item => `
-                                        <button onclick="toggleCustomization('${item.id}')" class="w-full p-3 rounded-lg border transition-all text-left ${selectedCustomizations.includes(item.id) ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}">
+                                        <button onclick="toggleCustomization('${item.id}')" class="w-full p-3 rounded-lg border-2 transition-all text-left ${selectedCustomizations.includes(item.id) ? 'border-pink-sand bg-pink-50' : 'border-gray-200 hover:border-aquamarine'}" style="${selectedCustomizations.includes(item.id) ? 'border-color: var(--pink-sand); background-color: rgba(242, 0, 125, 0.1);' : 'border-color: #e5e7eb;'}">
                                             <div class="flex items-center gap-2">
                                                 <span class="text-lg">${item.emoji}</span>
-                                                <span class="text-sm font-medium">${item.name}</span>
+                                                <span class="text-sm font-medium" style="color: var(--dark-lava);">${item.name}</span>
                                             </div>
                                         </button>
                                     `).join('')}
@@ -444,15 +532,22 @@
                         `).join('')}
                     </div>
 
-                    <div class="mt-6">
-                        <button onclick="clearCustomizations()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                    <!-- Campo personalizzato -->
+                    <div class="mt-8 p-4 rounded-lg" style="background-color: rgba(42, 190, 185, 0.1); border: 2px solid var(--aquamarine);">
+                        <h3 class="font-semibold text-lg mb-2" style="color: var(--sunset);">Aggiungi il tuo dettaglio personalizzato</h3>
+                        <p class="text-sm mb-3" style="color: var(--dark-lava);">E se vuoi aggiungine tu uno descrivendolo (es. logo della tua squadra di calcio)</p>
+                        <input type="text" id="custom-detail" value="${customDetail}" oninput="updateCustomDetail(this.value)" placeholder="Descrivi il tuo dettaglio personalizzato..." class="w-full p-3 border-2 rounded-lg focus:outline-none" style="border-color: var(--aquamarine); color: var(--dark-lava);">
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button onclick="clearCustomizations()" class="px-6 py-2 rounded-lg transition-colors" style="background-color: var(--white-flakes); color: var(--dark-lava); border: 2px solid var(--gray);">
                             Nessuna personalizzazione
                         </button>
                     </div>
 
-                    ${selectedCustomizations.length > 0 ? `
-                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                            <h3 class="font-medium text-gray-800 mb-2">Decorazioni selezionate:</h3>
+                    ${(selectedCustomizations.length > 0 || customDetail) ? `
+                        <div class="mt-6 p-4 rounded-lg" style="background-color: rgba(242, 0, 125, 0.1); border: 2px solid var(--pink-sand);">
+                            <h3 class="font-semibold text-lg mb-2" style="color: var(--sunset);">Dettagli selezionati:</h3>
                             <div class="flex flex-wrap gap-2">
                                 ${selectedCustomizations.map(itemId => {
                                     let item = null;
@@ -464,12 +559,17 @@
                                         }
                                     }
                                     return item ? `
-                                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium flex items-center gap-2">
+                                        <span class="px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2" style="background-color: var(--sunset); color: var(--white-flakes);">
                                             <span>${item.emoji}</span>
                                             ${item.name}
                                         </span>
                                     ` : '';
                                 }).join('')}
+                                ${customDetail ? `
+                                    <span class="px-4 py-2 rounded-full text-sm font-semibold" style="background-color: var(--sunrays); color: var(--dark-lava);">
+                                        ✨ ${customDetail}
+                                    </span>
+                                ` : ''}
                             </div>
                         </div>
                     ` : ''}
@@ -513,14 +613,14 @@
                 document.getElementById('step-content').innerHTML = `
                     <div class="space-y-6">
                         <div class="text-center">
-                            <h2 class="text-3xl font-bold text-gray-800 mb-2">La Tua Scarpa!</h2>
-                            <p class="text-gray-600">Pronta per essere generata dall'AI</p>
+                            <h2 class="title-font text-4xl font-bold mb-2" style="color: var(--sunset);">La Tua Scarpa!</h2>
+                            <p class="text-lg" style="color: var(--dark-lava);">Pronta per essere generata dall'AI</p>
                         </div>
 
-                        <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                        <div class="card-shadow rounded-2xl p-8 text-center" style="background-color: var(--white-flakes);">
                             <div class="text-8xl mb-4">🎨</div>
-                            <p class="text-gray-600 mb-6">Clicca per generare la tua scarpa con l'AI!</p>
-                            <button onclick="generateImage()" class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg">
+                            <p class="text-lg mb-6" style="color: var(--dark-lava);">Clicca per generare la tua scarpa con l'AI!</p>
+                            <button onclick="generateImage()" class="btn-primary px-8 py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg">
                                 📸 Genera Scarpa AI
                             </button>
                         </div>
@@ -530,21 +630,22 @@
                 document.getElementById('step-content').innerHTML = `
                     <div class="space-y-6">
                         <div class="text-center">
-                            <h2 class="text-3xl font-bold text-gray-800 mb-2">La Tua Scarpa!</h2>
-                            <p class="text-gray-600">Ecco il risultato della tua personalizzazione</p>
+                            <h2 class="title-font text-4xl font-bold mb-2" style="color: var(--sunset);">La Tua Scarpa!</h2>
+                            <p class="text-lg" style="color: var(--dark-lava);">Ecco il risultato della tua personalizzazione</p>
                         </div>
 
-                        <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
-                            <img src="${generatedImage}" alt="Scarpa personalizzata" class="max-w-full max-h-96 mx-auto rounded-lg shadow-lg mb-4">
-                            <div class="flex justify-center gap-4 mt-6">
-                                <button onclick="downloadImage()" class="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all transform hover:scale-105">
+                        <div class="card-shadow rounded-2xl p-8 text-center" style="background-color: var(--white-flakes);">
+                            <img src="${generatedImage}" alt="Scarpa personalizzata" class="max-w-full max-h-96 mx-auto rounded-lg shadow-lg mb-6">
+                            
+                            <div class="flex flex-col md:flex-row justify-center gap-4 mt-6">
+                                <button onclick="downloadImage()" class="btn-secondary flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg">
                                     📥 Scarica
                                 </button>
-                                <button onclick="shareImage()" class="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all transform hover:scale-105">
-                                    🔗 Condividi
-                                </button>
-                                <button onclick="generateNewImage()" class="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all transform hover:scale-105">
+                                <button onclick="generateNewImage()" class="btn-primary flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg">
                                     🎨 Genera Nuova
+                                </button>
+                                <button onclick="restartFromBeginning()" class="flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-all transform hover:scale-105 shadow-lg" style="background-color: var(--sunrays); color: var(--dark-lava);">
+                                    🔄 Ricomincia dall'inizio
                                 </button>
                             </div>
                         </div>
@@ -554,12 +655,21 @@
         }
 
         // Event handlers
+        function selectGender(gender) {
+            selectedGender = gender;
+            renderStep1();
+            updateNavigation();
+        }
+        
         function selectModel(modelId) {
             selectedModel = modelId;
             document.querySelectorAll('.model-btn').forEach(btn => {
-                btn.className = btn.className.replace('border-purple-500 bg-purple-50 ring-4 ring-purple-200', 'border-gray-200 hover:border-purple-300');
+                btn.style.borderColor = '#e5e7eb';
+                btn.style.backgroundColor = 'transparent';
             });
-            document.querySelector(`[data-model="${modelId}"]`).className = document.querySelector(`[data-model="${modelId}"]`).className.replace('border-gray-200 hover:border-purple-300', 'border-purple-500 bg-purple-50 ring-4 ring-purple-200');
+            const selectedBtn = document.querySelector(`[data-model="${modelId}"]`);
+            selectedBtn.style.borderColor = 'var(--pink-sand)';
+            selectedBtn.style.backgroundColor = 'rgba(242, 0, 125, 0.1)';
             updateNavigation();
         }
 
@@ -587,8 +697,13 @@
             renderStep3();
         }
 
+        function updateCustomDetail(value) {
+            customDetail = value;
+        }
+        
         function clearCustomizations() {
             selectedCustomizations = [];
+            customDetail = '';
             renderStep3();
         }
 
@@ -621,20 +736,27 @@
             }
         }
 
-        function shareImage() {
-            if (navigator.share && generatedImage) {
-                navigator.share({
-                    title: 'La mia scarpa personalizzata!',
-                    text: 'Guarda la scarpa che ho creato con Shoe Designer AI!'
-                });
-            } else {
-                alert('Funzione di condivisione non supportata. Usa il pulsante Scarica per salvare l\'immagine.');
-            }
-        }
-
         function generateNewImage() {
             generatedImage = null;
             generateImage();
+        }
+        
+        function restartFromBeginning() {
+            // Reset di tutto lo stato
+            currentStep = 1;
+            selectedGender = 'unisex';
+            selectedModel = null;
+            selectedColors = [];
+            selectedCustomizations = [];
+            customDetail = '';
+            selectedStyle = null;
+            customStyle = '';
+            expandedCategory = null;
+            generatedImage = null;
+            isGenerating = false;
+            
+            // Torna al primo step
+            goToStep(1);
         }
 
         // Navigation
