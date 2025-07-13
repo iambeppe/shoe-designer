@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shoe Designer - Crea la tua scarpa dell'empatia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen">
+    <div id="app" class="max-w-4xl mx-auto p-6">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
+                Shoe Designer AI
+            </h1>
+            <p class="text-xl text-gray-700">Crea la tua scarpa dell'empatia personalizzata</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-600">Step <span id="current-step">1</span> di 5</span>
+                <span class="text-sm text-gray-500"><span id="progress-percent">20</span>%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div id="step-content"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-between">
+            <button id="prev-btn" class="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                ← Indietro
+            </button>
+            <button id="next-btn" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                Avanti →
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Stato dell'applicazione
+        let currentStep = 1;
+        let selectedModel = null;
+        let selectedColors = [];
+        let selectedCustomizations = [];
+        let selectedStyle = null;
+        let customStyle = '';
+        let expandedCategory = null;
+        let generatedImage = null;
+        let isGenerating = false;
+
+        // Dati dell'applicazione
+        const shoeModels = [
+            { id: 'sneaker', name: 'Sneaker', emoji: '👟' },
+            { id: 'ballet', name: 'Ballerina', emoji: '🩰' },
+            { id: 'boot', name: 'Stivale', emoji: '👢' },
+            { id: 'heel', name: 'Tacco Alto', emoji: '👠' },
+            { id: 'sandal', name: 'Sandalo', emoji: '👡' },
+            { id: 'loafer', name: 'Mocassino', emoji: '👞' },
+            { id: 'oxford', name: 'Oxford', emoji: '👔' },
+            { id: 'slip_on', name: 'Slip-on', emoji: '🥿' }
+        ];
+
+        const colorPalette = [
+            { id: 'red', name: 'Rosso', hex: '#FF4444' },
+            { id: 'blue', name: 'Blu', hex: '#4444FF' },
+            { id: 'green', name: 'Verde', hex: '#44FF44' },
+            { id: 'yellow', name: 'Giallo', hex: '#FFFF44' },
+            { id: 'purple', name: 'Viola', hex: '#AA44FF' },
+            { id: 'orange', name: 'Arancione', hex: '#FF8844' },
+            { id: 'pink', name: 'Rosa', hex: '#FF44AA' },
+            { id: 'teal', name: 'Turchese', hex: '#44FFAA' },
+            { id: 'brown', name: 'Marrone', hex: '#8B4513' },
+            { id: 'black', name: 'Nero', hex: '#333333' },
+            { id: 'white', name: 'Bianco', hex: '#FFFFFF' },
+            { id: 'gold', name: 'Oro', hex: '#FFD700' },
+            { id: 'silver', name: 'Argento', hex: '#C0C0C0' },
+            { id: 'coral', name: 'Corallo', hex: '#FF7F50' },
+            { id: 'mint', name: 'Menta', hex: '#98FB98' },
+            { id: 'navy', name: 'Blu Navy', hex: '#000080' }
+        ];
+
+        const customizationCategories = [
+            {
+                id: 'animals',
+                name: 'Animali',
+                items: [
+                    { id: 'cat', name: 'Gattino', emoji: '🐱' },
+                    { id: 'dog', name: 'Cagnolino', emoji: '🐶' },
+                    { id: 'butterfly', name: 'Farfalla', emoji: '🦋' },
+                    { id: 'unicorn', name: 'Unicorno', emoji: '🦄' }
+                ]
+            },
+            {
+                id: 'nature',
+                name: 'Natura',
+                items: [
+                    { id: 'rainbow', name: 'Arcobaleno', emoji: '🌈' },
+                    { id: 'flower', name: 'Fiore', emoji: '🌸' },
+                    { id: 'star', name: 'Stella', emoji: '⭐' },
+                    { id: 'moon', name: 'Luna', emoji: '🌙' }
+                ]
+            },
+            {
+                id: 'art',
+                name: 'Arte Classica',
+                items: [
+                    { id: 'scream', name: 'Urlo di Munch', emoji: '😱' },
+                    { id: 'sunflower', name: 'Girasoli Van Gogh', emoji: '🌻' },
+                    { id: 'wave', name: 'Onda Giapponese', emoji: '🌊' },
+                    { id: 'starry', name: 'Notte Stellata', emoji: '🌌' }
+                ]
+            },
+            {
+                id: 'geometric',
+                name: 'Geometrico',
+                items: [
+                    { id: 'stripes', name: 'Righe', emoji: '〰️' },
+                    { id: 'dots', name: 'Pois', emoji: '⚪' },
+                    { id: 'zigzag', name: 'Zigzag', emoji: '⚡' },
+                    { id: 'chevron', name: 'Chevron', emoji: '📐' }
+                ]
+            },
+            {
+                id: 'symbols',
+                name: 'Simboli',
+                items: [
+                    { id: 'heart', name: 'Cuore', emoji: '💖' },
+                    { id: 'lightning', name: 'Fulmine', emoji: '⚡' },
+                    { id: 'peace', name: 'Pace', emoji: '☮️' },
+                    { id: 'music', name: 'Nota Musicale', emoji: '🎵' }
+                ]
+            },
+            {
+                id: 'food',
+                name: 'Cibo',
+                items: [
+                    { id: 'pizza', name: 'Pizza', emoji: '🍕' },
+                    { id: 'donut', name: 'Ciambella', emoji: '🍩' },
+                    { id: 'cherry', name: 'Ciliegia', emoji: '🍒' },
+                    { id: 'avocado', name: 'Avocado', emoji: '🥑' }
+                ]
+            },
+            {
+                id: 'space',
+                name: 'Spazio',
+                items: [
+                    { id: 'planet', name: 'Pianeta', emoji: '🪐' },
+                    { id: 'rocket', name: 'Razzo', emoji: '🚀' },
+                    { id: 'alien', name: 'Alieno', emoji: '👽' },
+                    { id: 'ufo', name: 'UFO', emoji: '🛸' }
+                ]
+            },
+            {
+                id: 'lastminute',
+                name: 'Lastminute Flamoji',
+                items: [
+                    { id: 'flame1', name: 'Fiamma Cool', emoji: '🔥' },
+                    { id: 'flame2', name: 'Fiamma Party', emoji: '🎉' },
+                    { id: 'flame3', name: 'Fiamma Travel', emoji: '✈️' },
+                    { id: 'flame4', name: 'Fiamma Love', emoji: '💕' }
+                ]
+            }
+        ];
+
+        const styleOptions = [
+            { id: 'party', name: 'Party People', description: 'Brillante e festoso' },
+            { id: 'umbria', name: 'Ho l\'Umbria nel cuore', description: 'Rustico e autentico' },
+            { id: 'animalier', name: 'Animalier', description: 'Pattern animaleschi' },
+            { id: 'bohemian', name: 'Artista Bohémien', description: 'Creativo e libero' },
+            { id: 'london', name: 'London Calling', description: 'Stile britannico' },
+            { id: 'minimalist', name: 'Minimalista', description: 'Pulito e essenziale' },
+            { id: 'vintage', name: 'Vintage', description: 'Retrò e nostalgico' },
+            { id: 'futuristic', name: 'Futuristico', description: 'Tecnologico e moderno' }
+        ];
+
+        // Funzioni di utilità
+        function updateProgress() {
+            document.getElementById('current-step').textContent = currentStep;
+            document.getElementById('progress-percent').textContent = Math.round((currentStep / 5) * 100);
+            document.getElementById('progress-bar').style.width = `${(currentStep / 5) * 100}%`;
+        }
+
+        function canGoNext() {
+            switch(currentStep) {
+                case 1: return selectedModel !== null;
+                case 2: return selectedColors.length > 0;
+                case 3: return true;
+                case 4: return true;
+                default: return false;
+            }
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.disabled = !canGoNext();
+            nextBtn.style.display = currentStep === 5 ? 'none' : 'flex';
+        }
+
+        // Generazione del prompt
+        function generatePrompt() {
+            const modelName = shoeModels.find(m => m.id === selectedModel)?.name || 'shoe';
+            const colors = selectedColors.map(c => colorPalette.find(color => color.id === c)?.name).join(', ');
+            const customizations = selectedCustomizations.map(c => {
+                for (const category of customizationCategories) {
+                    const item = category.items.find(i => i.id === c);
+                    if (item) return item.name;
+                }
+                return '';
+            }).join(', ');
+            const style = selectedStyle ? styleOptions.find(s => s.id === selectedStyle)?.name : customStyle;
+
+            let finalPrompt = `professional photography of a realistic ${modelName} shoe, colors: ${colors}`;
+            
+            if (customizations) {
+                finalPrompt += `, decorations: ${customizations}`;
+            }
+            
+            if (style) {
+                finalPrompt += `, style: ${style}`;
+            }
+            
+            finalPrompt += `, side view, neutral background, perfect lighting, high quality, detailed, photorealistic, studio lighting`;
+            
+            return finalPrompt;
+        }
+
+        // Generazione dell'immagine con AI
+        async function generateImage() {
+            if (isGenerating) return;
+            
+            isGenerating = true;
+            const prompt = generatePrompt();
+            
+            // Mostra loading
+            document.getElementById('step-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Generando la tua scarpa...</h2>
+                        <p class="text-gray-600">L'AI sta creando la tua scarpa personalizzata</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                        <div class="loading-spinner mx-auto mb-4"></div>
+                        <p class="text-purple-600 font-medium">Chiamata AI in corso...</p>
+                        <p class="text-sm text-gray-500 mt-2">Questo può richiedere 10-30 secondi</p>
+                    </div>
+                </div>
+            `;
+
+            try {
+                // Prova con Pollinations (più affidabile)
+                const encodedPrompt = encodeURIComponent(prompt);
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&seed=${Math.floor(Math.random() * 1000000)}&model=flux&enhance=true&nologo=true`;
+                
+                // Testa il caricamento dell'immagine
+                await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = imageUrl;
+                    
+                    // Timeout di 30 secondi
+                    setTimeout(reject, 30000);
+                });
+
+                generatedImage = imageUrl;
+                renderStep5();
+                
+            } catch (error) {
+                console.error('Errore Pollinations, provo Hugging Face...', error);
+                
+                try {
+                    // Fallback a Hugging Face
+                    const response = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            inputs: prompt,
+                            parameters: {
+                                width: 512,
+                                height: 512,
+                                guidance_scale: 7.5,
+                                num_inference_steps: 20
+                            }
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        generatedImage = URL.createObjectURL(blob);
+                        renderStep5();
+                    } else {
+                        throw new Error('Hugging Face API error');
+                    }
+                    
+                } catch (hfError) {
+                    console.error('Errore Hugging Face:', hfError);
+                    
+                    // Fallback finale: mostra il prompt per uso manuale
+                    document.getElementById('step-content').innerHTML = `
+                        <div class="space-y-6">
+                            <div class="text-center">
+                                <h2 class="text-3xl font-bold text-gray-800 mb-2">Servizio AI temporaneamente non disponibile</h2>
+                                <p class="text-gray-600">Ma puoi usare questo prompt con ChatGPT o Gemini!</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-6">
+                                <h3 class="font-bold text-lg mb-4">Copia questo prompt:</h3>
+                                <textarea readonly class="w-full h-32 p-4 border rounded-lg bg-white font-mono text-sm">${prompt}</textarea>
+                                <button onclick="navigator.clipboard.writeText('${prompt}')" class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                    Copia Prompt
+                                </button>
+                            </div>
+                            <div class="text-center text-sm text-gray-600">
+                                <p>1. Copia il prompt qui sopra</p>
+                                <p>2. Vai su ChatGPT o Gemini</p>
+                                <p>3. Incolla il prompt</p>
+                                <p>4. Ottieni la tua scarpa personalizzata!</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            isGenerating = false;
+        }
+
+        // Render degli step
+        function renderStep1() {
+            document.getElementById('step-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Scegli il Modello</h2>
+                        <p class="text-gray-600">Seleziona il tipo di scarpa che vuoi personalizzare</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${shoeModels.map(model => `
+                            <button onclick="selectModel('${model.id}')" class="model-btn p-6 rounded-xl border-2 transition-all transform hover:scale-105 ${selectedModel === model.id ? 'border-purple-500 bg-purple-50 ring-4 ring-purple-200' : 'border-gray-200 hover:border-purple-300'}" data-model="${model.id}">
+                                <div class="text-4xl mb-2">${model.emoji}</div>
+                                <div class="font-medium text-gray-800">${model.name}</div>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep2() {
+            document.getElementById('step-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Scegli i Colori</h2>
+                        <p class="text-gray-600">Seleziona da 1 a 4 colori per la tua scarpa</p>
+                        <div class="mt-2 text-sm text-purple-600 font-medium">
+                            ${selectedColors.length}/4 colori selezionati
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-4 md:grid-cols-8 gap-3">
+                        ${colorPalette.map(color => `
+                            <button onclick="toggleColor('${color.id}')" class="color-btn relative w-16 h-16 rounded-lg border-4 transition-all transform hover:scale-110 ${selectedColors.includes(color.id) ? 'border-gray-800 ring-4 ring-purple-300' : 'border-gray-300 hover:border-gray-400'}" style="background-color: ${color.hex}" title="${color.name}" data-color="${color.id}">
+                                ${selectedColors.includes(color.id) ? '<div class="absolute inset-0 flex items-center justify-center"><div class="w-6 h-6 bg-white rounded-full flex items-center justify-center"><div class="w-3 h-3 bg-gray-800 rounded-full"></div></div></div>' : ''}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    ${selectedColors.length > 0 ? `
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium text-gray-800 mb-2">Colori selezionati:</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${selectedColors.map(colorId => {
+                                    const color = colorPalette.find(c => c.id === colorId);
+                                    return `
+                                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium flex items-center gap-2">
+                                            <div class="w-3 h-3 rounded-full border border-gray-400" style="background-color: ${color.hex}"></div>
+                                            ${color.name}
+                                        </span>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderStep3() {
+            document.getElementById('step-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Personalizzazione</h2>
+                        <p class="text-gray-600">Aggiungi fino a 3 decorazioni alla tua scarpa</p>
+                        <div class="mt-2 text-sm text-purple-600 font-medium">
+                            ${selectedCustomizations.length}/3 decorazioni selezionate
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${customizationCategories.map(category => `
+                            <div class="border rounded-lg overflow-hidden">
+                                <button onclick="toggleCategory('${category.id}')" class="w-full p-4 bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between">
+                                    <span class="font-medium text-gray-800">${category.name}</span>
+                                    <span class="transform transition-transform ${expandedCategory === category.id ? 'rotate-90' : ''}">▶</span>
+                                </button>
+                                
+                                <div id="category-${category.id}" class="p-2 space-y-2" style="display: ${expandedCategory === category.id ? 'block' : 'none'}">
+                                    ${category.items.map(item => `
+                                        <button onclick="toggleCustomization('${item.id}')" class="w-full p-3 rounded-lg border transition-all text-left ${selectedCustomizations.includes(item.id) ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-lg">${item.emoji}</span>
+                                                <span class="text-sm font-medium">${item.name}</span>
+                                            </div>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="mt-6">
+                        <button onclick="clearCustomizations()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                            Nessuna personalizzazione
+                        </button>
+                    </div>
+
+                    ${selectedCustomizations.length > 0 ? `
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-medium text-gray-800 mb-2">Decorazioni selezionate:</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${selectedCustomizations.map(itemId => {
+                                    let item = null;
+                                    for (const category of customizationCategories) {
+                                        const found = category.items.find(i => i.id === itemId);
+                                        if (found) {
+                                            item = found;
+                                            break;
+                                        }
+                                    }
+                                    return item ? `
+                                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium flex items-center gap-2">
+                                            <span>${item.emoji}</span>
+                                            ${item.name}
+                                        </span>
+                                    ` : '';
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderStep4() {
+            document.getElementById('step-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Stile</h2>
+                        <p class="text-gray-600">Scegli uno stile o creane uno personalizzato</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${styleOptions.map(style => `
+                            <button onclick="selectStyle('${style.id}')" class="style-btn p-4 rounded-lg border-2 transition-all text-left ${selectedStyle === style.id ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}" data-style="${style.id}">
+                                <div class="font-medium text-gray-800">${style.name}</div>
+                                <div class="text-sm text-gray-600">${style.description}</div>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <div class="mt-6">
+                        <h3 class="font-medium text-gray-800 mb-2">Oppure scrivi il tuo stile:</h3>
+                        <input type="text" id="custom-style" value="${customStyle}" oninput="updateCustomStyle(this.value)" placeholder="Descrivi il tuo stile personalizzato..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+
+                    <div class="mt-6">
+                        <button onclick="clearStyle()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                            Nessuno stile specifico
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep5() {
+            if (!generatedImage) {
+                document.getElementById('step-content').innerHTML = `
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-2">La Tua Scarpa!</h2>
+                            <p class="text-gray-600">Pronta per essere generata dall'AI</p>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                            <div class="text-8xl mb-4">🎨</div>
+                            <p class="text-gray-600 mb-6">Clicca per generare la tua scarpa con l'AI!</p>
+                            <button onclick="generateImage()" class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg">
+                                📸 Genera Scarpa AI
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('step-content').innerHTML = `
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-2">La Tua Scarpa!</h2>
+                            <p class="text-gray-600">Ecco il risultato della tua personalizzazione</p>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                            <img src="${generatedImage}" alt="Scarpa personalizzata" class="max-w-full max-h-96 mx-auto rounded-lg shadow-lg mb-4">
+                            <div class="flex justify-center gap-4 mt-6">
+                                <button onclick="downloadImage()" class="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all transform hover:scale-105">
+                                    📥 Scarica
+                                </button>
+                                <button onclick="shareImage()" class="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all transform hover:scale-105">
+                                    🔗 Condividi
+                                </button>
+                                <button onclick="generateNewImage()" class="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all transform hover:scale-105">
+                                    🎨 Genera Nuova
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Event handlers
+        function selectModel(modelId) {
+            selectedModel = modelId;
+            document.querySelectorAll('.model-btn').forEach(btn => {
+                btn.className = btn.className.replace('border-purple-500 bg-purple-50 ring-4 ring-purple-200', 'border-gray-200 hover:border-purple-300');
+            });
+            document.querySelector(`[data-model="${modelId}"]`).className = document.querySelector(`[data-model="${modelId}"]`).className.replace('border-gray-200 hover:border-purple-300', 'border-purple-500 bg-purple-50 ring-4 ring-purple-200');
+            updateNavigation();
+        }
+
+        function toggleColor(colorId) {
+            if (selectedColors.includes(colorId)) {
+                selectedColors = selectedColors.filter(c => c !== colorId);
+            } else if (selectedColors.length < 4) {
+                selectedColors.push(colorId);
+            }
+            renderStep2();
+            updateNavigation();
+        }
+
+        function toggleCategory(categoryId) {
+            expandedCategory = expandedCategory === categoryId ? null : categoryId;
+            renderStep3();
+        }
+
+        function toggleCustomization(itemId) {
+            if (selectedCustomizations.includes(itemId)) {
+                selectedCustomizations = selectedCustomizations.filter(c => c !== itemId);
+            } else if (selectedCustomizations.length < 3) {
+                selectedCustomizations.push(itemId);
+            }
+            renderStep3();
+        }
+
+        function clearCustomizations() {
+            selectedCustomizations = [];
+            renderStep3();
+        }
+
+        function selectStyle(styleId) {
+            selectedStyle = styleId;
+            customStyle = '';
+            renderStep4();
+        }
+
+        function updateCustomStyle(value) {
+            customStyle = value;
+            selectedStyle = null;
+            document.querySelectorAll('.style-btn').forEach(btn => {
+                btn.className = btn.className.replace('border-purple-500 bg-purple-50', 'border-gray-200 hover:border-purple-300');
+            });
+        }
+
+        function clearStyle() {
+            selectedStyle = null;
+            customStyle = '';
+            renderStep4();
+        }
+
+        function downloadImage() {
+            if (generatedImage) {
+                const link = document.createElement('a');
+                link.download = 'mia-scarpa-personalizzata.png';
+                link.href = generatedImage;
+                link.click();
+            }
+        }
+
+        function shareImage() {
+            if (navigator.share && generatedImage) {
+                navigator.share({
+                    title: 'La mia scarpa personalizzata!',
+                    text: 'Guarda la scarpa che ho creato con Shoe Designer AI!'
+                });
+            } else {
+                alert('Funzione di condivisione non supportata. Usa il pulsante Scarica per salvare l\'immagine.');
+            }
+        }
+
+        function generateNewImage() {
+            generatedImage = null;
+            generateImage();
+        }
+
+        // Navigation
+        function goToStep(step) {
+            currentStep = step;
+            updateProgress();
+            updateNavigation();
+            
+            switch(step) {
+                case 1: renderStep1(); break;
+                case 2: renderStep2(); break;
+                case 3: renderStep3(); break;
+                case 4: renderStep4(); break;
+                case 5: renderStep5(); break;
+            }
+        }
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentStep < 5 && canGoNext()) {
+                goToStep(currentStep + 1);
+            }
+        });
+
+        // Inizializzazione
+        goToStep(1);
+    </script>
+</body>
+</html>
