@@ -46,7 +46,7 @@
         }
         
         .gradient-secondary {
-            background: linear-gradient(135deg, var(--sunrays), var(--pink-sand));
+            background: var(--sunset);
         }
         
         .btn-primary {
@@ -106,7 +106,7 @@
             <button id="prev-btn" class="flex items-center gap-2 px-6 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--white-flakes); color: var(--dark-lava); border: 2px solid var(--aquamarine);">
                 ← Indietro
             </button>
-            <button id="next-btn" class="btn-primary flex items-center gap-2 px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            <button id="next-btn" class="flex items-center gap-2 px-6 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--white-flakes); color: var(--dark-lava); border: 2px solid var(--sunset);">
                 Avanti →
             </button>
         </div>
@@ -161,7 +161,15 @@
             { id: 'gray', name: 'Grigio', displayName: 'Grigio', hex: '#6b7280', aiName: 'gray' },
             { id: 'gold', name: 'Oro', displayName: 'Oro', hex: '#d97706', aiName: 'gold' },
             { id: 'silver', name: 'Argento', displayName: 'Argento', hex: '#9ca3af', aiName: 'silver' },
-            { id: 'red', name: 'Rosso', displayName: 'Rosso', hex: '#dc2626', aiName: 'red' }
+            { id: 'red', name: 'Rosso', displayName: 'Rosso', hex: '#dc2626', aiName: 'red' },
+            
+            // Quarta fila - Nuovi colori aggiunti
+            { id: 'coral', name: 'Corallo', displayName: 'Corallo', hex: '#ff7f50', aiName: 'coral' },
+            { id: 'lavender', name: 'Lavanda', displayName: 'Lavanda', hex: '#e6e6fa', aiName: 'lavender' },
+            { id: 'turquoise', name: 'Turchese', displayName: 'Turchese', hex: '#40e0d0', aiName: 'turquoise' },
+            { id: 'navy', name: 'Blu Navy', displayName: 'Blu Navy', hex: '#000080', aiName: 'navy blue' },
+            { id: 'cream', name: 'Crema', displayName: 'Crema', hex: '#fffdd0', aiName: 'cream' },
+            { id: 'burgundy', name: 'Bordeaux', displayName: 'Bordeaux', hex: '#800020', aiName: 'burgundy' }
         ];
 
         const customizationCategories = [
@@ -186,7 +194,7 @@
                     { id: 'star', name: 'Stella', emoji: '⭐' },
                     { id: 'moon', name: 'Luna', emoji: '🌙' },
                     { id: 'sun', name: 'Sole', emoji: '☀️' },
-                    { id: 'lightning', name: 'Fulmine', emoji: '⚡' }
+                    { id: 'sea', name: 'Mare', emoji: '🌊' }
                 ]
             },
             {
@@ -208,7 +216,7 @@
                     { id: 'stripes', name: 'Righe', emoji: '〰️' },
                     { id: 'dots', name: 'Pois', emoji: '⚪' },
                     { id: 'zigzag', name: 'Zigzag', emoji: '⚡' },
-                    { id: 'chevron', name: 'Chevron', emoji: '📐' },
+                    { id: 'chevron', name: 'Chevron', emoji: '🔰' },
                     { id: 'triangle', name: 'Triangoli', emoji: '🔺' },
                     { id: 'circle', name: 'Cerchi', emoji: '⭕' }
                 ]
@@ -235,6 +243,18 @@
                     { id: 'avocado', name: 'Avocado', emoji: '🥑' },
                     { id: 'strawberry', name: 'Fragola', emoji: '🍓' },
                     { id: 'ice_cream', name: 'Gelato', emoji: '🍦' }
+                ]
+            },
+            {
+                id: 'energy',
+                name: 'Energia & Motivazione',
+                items: [
+                    { id: 'flame_cool', name: 'Fiamma Cool', emoji: '🔥' },
+                    { id: 'flame_party', name: 'Fiamma Party', emoji: '🎉' },
+                    { id: 'flame_travel', name: 'Viaggio', emoji: '✈️' },
+                    { id: 'flame_love', name: 'Amore', emoji: '💕' },
+                    { id: 'rocket', name: 'Razzo', emoji: '🚀' },
+                    { id: 'muscle', name: 'Team Building', emoji: '💪' }
                 ]
             }
         ];
@@ -474,7 +494,7 @@
                     <div class="grid grid-cols-6 gap-3">
                         ${colorPalette.map(color => `
                             <button onclick="toggleColor('${color.id}')" class="color-btn relative w-16 h-16 rounded-lg border-3 transition-all transform hover:scale-110 hover:shadow-lg ${selectedColors.includes(color.id) ? 'border-pink-sand shadow-xl' : 'border-gray-300 hover:border-aquamarine'}" style="background-color: ${color.hex}; ${selectedColors.includes(color.id) ? 'border-color: var(--pink-sand);' : 'border-color: #d1d5db;'} border-width: 3px;" title="${color.displayName}" data-color="${color.id}">
-                                ${selectedColors.includes(color.id) ? '<div class="absolute inset-0 flex items-center justify-center"><div style="color: ' + (color.hex === '#ffffff' || color.hex === '#ffb511' || color.hex === '#7dd3fc' || color.hex === '#87ceeb' ? 'var(--dark-lava)' : 'var(--white-flakes)') + '; font-size: 24px; font-weight: bold;">✓</div></div>' : ''}
+                                ${selectedColors.includes(color.id) ? '<div class="absolute inset-0 flex items-center justify-center"><div style="color: ' + (color.hex === '#ffffff' || color.hex === '#ffb511' || color.hex === '#7dd3fc' || color.hex === '#87ceeb' || color.hex === '#e6e6fa' || color.hex === '#fffdd0' ? 'var(--dark-lava)' : 'var(--white-flakes)') + '; font-size: 24px; font-weight: bold;">✓</div></div>' : ''}
                             </button>
                         `).join('')}
                     </div>
