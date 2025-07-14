@@ -115,7 +115,7 @@
     <script>
         // Stato dell'applicazione
         let currentStep = 1;
-        let selectedGender = 'unisex';
+        let selectedGender = null;
         let selectedModel = null;
         let selectedColors = [];
         let selectedCustomizations = [];
@@ -246,6 +246,18 @@
                 ]
             },
             {
+                id: 'sport',
+                name: 'Sport',
+                items: [
+                    { id: 'soccer', name: 'Calcio', emoji: '⚽' },
+                    { id: 'tennis', name: 'Tennis', emoji: '🎾' },
+                    { id: 'athletics', name: 'Atletica', emoji: '🏃' },
+                    { id: 'formula1', name: 'Formula 1', emoji: '🏎️' },
+                    { id: 'volleyball', name: 'Pallavolo', emoji: '🏐' },
+                    { id: 'basketball', name: 'Basket', emoji: '🏀' }
+                ]
+            },
+            {
                 id: 'energy',
                 name: 'Energia & Motivazione',
                 items: [
@@ -279,7 +291,7 @@
 
         function canGoNext() {
             switch(currentStep) {
-                case 1: return selectedModel !== null;
+                case 1: return selectedModel !== null && selectedGender !== null;
                 case 2: return selectedColors.length > 0;
                 case 3: return true;
                 case 4: return true;
@@ -318,7 +330,7 @@
             const style = selectedStyle ? styleOptions.find(s => s.id === selectedStyle)?.name : customStyle;
             
             // Aggiungi indicazione genere
-            const genderText = selectedGender === 'male' ? 'for men' : selectedGender === 'female' ? 'for women' : 'unisex';
+            const genderText = selectedGender === 'male' ? 'for men' : selectedGender === 'female' ? 'for women' : selectedGender === 'unisex' ? 'unisex' : '';
 
             let finalPrompt = `professional photography of a realistic ${modelName} shoe ${genderText}, colors: ${colors}`;
             
@@ -764,7 +776,7 @@
         function restartFromBeginning() {
             // Reset di tutto lo stato
             currentStep = 1;
-            selectedGender = 'unisex';
+            selectedGender = null;
             selectedModel = null;
             selectedColors = [];
             selectedCustomizations = [];
@@ -784,6 +796,9 @@
             currentStep = step;
             updateProgress();
             updateNavigation();
+            
+            // Scroll to top when changing step
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             
             switch(step) {
                 case 1: renderStep1(); break;
